@@ -14,6 +14,9 @@ export default function Home() {
   const [messages, setMessages] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
 
+  const [personality, setPersonality] =
+    useState("friendly");
+
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
 
   // auto scroll
@@ -22,23 +25,23 @@ export default function Home() {
       behavior: "smooth",
     });
   }, [messages, loading]);
-  
-  // load chats from localStorage
-useEffect(() => {
-  const savedMessages = localStorage.getItem("ai-chat");
 
-  if (savedMessages) {
-    setMessages(JSON.parse(savedMessages));
-  }
-}, []);
+  // load chats
+  useEffect(() => {
+    const savedMessages = localStorage.getItem("ai-chat");
 
-// save chats to localStorage
-useEffect(() => {
-  localStorage.setItem(
-    "ai-chat",
-    JSON.stringify(messages)
-  );
-}, [messages]);
+    if (savedMessages) {
+      setMessages(JSON.parse(savedMessages));
+    }
+  }, []);
+
+  // save chats
+  useEffect(() => {
+    localStorage.setItem(
+      "ai-chat",
+      JSON.stringify(messages)
+    );
+  }, [messages]);
 
   // voice input
   const startListening = () => {
@@ -84,6 +87,7 @@ useEffect(() => {
         },
         body: JSON.stringify({
           message: currentMessage,
+          personality,
         }),
       });
 
@@ -171,6 +175,55 @@ useEffect(() => {
           >
             <Trash2 size={20} className="text-red-500" />
           </button>
+        </div>
+
+        {/* personalities */}
+        <div className="flex gap-2 px-5 pt-4 overflow-x-auto">
+
+          <button
+            onClick={() => setPersonality("jarvis")}
+            className={`px-4 py-2 rounded-xl text-sm transition ${
+              personality === "jarvis"
+                ? "bg-violet-500 text-white"
+                : "bg-white text-gray-700"
+            }`}
+          >
+            Jarvis
+          </button>
+
+          <button
+            onClick={() => setPersonality("teacher")}
+            className={`px-4 py-2 rounded-xl text-sm transition ${
+              personality === "teacher"
+                ? "bg-violet-500 text-white"
+                : "bg-white text-gray-700"
+            }`}
+          >
+            Teacher
+          </button>
+
+          <button
+            onClick={() => setPersonality("interviewer")}
+            className={`px-4 py-2 rounded-xl text-sm transition ${
+              personality === "interviewer"
+                ? "bg-violet-500 text-white"
+                : "bg-white text-gray-700"
+            }`}
+          >
+            Interviewer
+          </button>
+
+          <button
+            onClick={() => setPersonality("friendly")}
+            className={`px-4 py-2 rounded-xl text-sm transition ${
+              personality === "friendly"
+                ? "bg-violet-500 text-white"
+                : "bg-white text-gray-700"
+            }`}
+          >
+            Friendly
+          </button>
+
         </div>
 
         {/* messages */}
