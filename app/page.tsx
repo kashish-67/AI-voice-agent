@@ -9,6 +9,8 @@ import {
   Sparkles,
 } from "lucide-react";
 
+import ReactMarkdown from "react-markdown";
+
 export default function Home() {
   const [message, setMessage] = useState("");
   const [messages, setMessages] = useState<any[]>([]);
@@ -49,10 +51,13 @@ export default function Home() {
     const recognition = new webkitSpeechRecognition();
 
     recognition.lang = "en-US";
+
     recognition.start();
 
     recognition.onresult = (event: any) => {
-      const transcript = event.results[0][0].transcript;
+      const transcript =
+        event.results[0][0].transcript;
+
       setMessage(transcript);
     };
   };
@@ -93,7 +98,8 @@ export default function Home() {
 
       const data = await response.json();
 
-      const fullText = data.reply || data.error;
+      const fullText =
+        data.reply || data.error;
 
       let currentText = "";
 
@@ -109,7 +115,7 @@ export default function Home() {
         currentText += fullText[i];
 
         await new Promise((resolve) =>
-          setTimeout(resolve, 15)
+          setTimeout(resolve, 10)
         );
 
         setMessages((prev: any) => {
@@ -125,9 +131,10 @@ export default function Home() {
       }
 
       // voice reply
-      const speech = new SpeechSynthesisUtterance(
-        fullText
-      );
+      const speech =
+        new SpeechSynthesisUtterance(
+          fullText
+        );
 
       speech.lang = "en-US";
 
@@ -143,27 +150,30 @@ export default function Home() {
   };
 
   return (
-    <main className="min-h-screen bg-gradient-to-br from-[#fdfbfb] to-[#ebedee] flex items-center justify-center p-4">
+    <main className="min-h-screen bg-gradient-to-br from-[#f8fafc] via-[#eef2ff] to-[#fdf2f8] flex items-center justify-center p-2 md:p-4">
 
-      <div className="w-full max-w-3xl h-[92vh] bg-white/80 backdrop-blur-2xl border border-gray-200 rounded-[35px] shadow-[0_20px_80px_rgba(0,0,0,0.08)] flex flex-col overflow-hidden">
+      <div className="w-full max-w-4xl h-[95vh] bg-white/80 backdrop-blur-2xl border border-gray-200 rounded-[30px] md:rounded-[40px] shadow-[0_20px_80px_rgba(0,0,0,0.08)] flex flex-col overflow-hidden">
 
         {/* header */}
-        <div className="flex items-center justify-between p-6 border-b border-gray-200 bg-white/60 backdrop-blur-xl">
+        <div className="flex items-center justify-between p-4 md:p-6 border-b border-gray-200 bg-white/70 backdrop-blur-xl">
 
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-3 md:gap-4">
 
-            <div className="bg-gradient-to-r from-violet-500 to-blue-500 p-4 rounded-3xl shadow-lg">
-              <Bot size={28} className="text-white" />
+            <div className="bg-gradient-to-r from-violet-500 to-blue-500 p-3 md:p-4 rounded-3xl shadow-lg">
+              <Bot
+                size={24}
+                className="text-white"
+              />
             </div>
 
             <div>
-              <h1 className="text-2xl font-bold text-gray-800">
+              <h1 className="text-xl md:text-3xl font-bold text-gray-800">
                 AI Voice Assistant
               </h1>
 
-              <p className="text-gray-500 text-sm flex items-center gap-1 mt-1">
+              <p className="text-gray-500 text-xs md:text-sm flex items-center gap-1 mt-1">
                 <Sparkles size={14} />
-                Smart Premium AI Experience
+                Premium AI Experience
               </p>
             </div>
           </div>
@@ -171,76 +181,58 @@ export default function Home() {
           {/* clear */}
           <button
             onClick={clearChat}
-            className="bg-red-100 hover:bg-red-200 transition p-3 rounded-2xl"
+            className="bg-red-100 hover:bg-red-200 transition p-2 md:p-3 rounded-2xl"
           >
-            <Trash2 size={20} className="text-red-500" />
+            <Trash2
+              size={18}
+              className="text-red-500"
+            />
           </button>
         </div>
 
         {/* personalities */}
-        <div className="flex gap-2 px-5 pt-4 overflow-x-auto">
+        <div className="flex gap-2 px-3 md:px-5 pt-4 overflow-x-auto">
 
-          <button
-            onClick={() => setPersonality("jarvis")}
-            className={`px-4 py-2 rounded-xl text-sm transition ${
-              personality === "jarvis"
-                ? "bg-violet-500 text-white"
-                : "bg-white text-gray-700"
-            }`}
-          >
-            Jarvis
-          </button>
-
-          <button
-            onClick={() => setPersonality("teacher")}
-            className={`px-4 py-2 rounded-xl text-sm transition ${
-              personality === "teacher"
-                ? "bg-violet-500 text-white"
-                : "bg-white text-gray-700"
-            }`}
-          >
-            Teacher
-          </button>
-
-          <button
-            onClick={() => setPersonality("interviewer")}
-            className={`px-4 py-2 rounded-xl text-sm transition ${
-              personality === "interviewer"
-                ? "bg-violet-500 text-white"
-                : "bg-white text-gray-700"
-            }`}
-          >
-            Interviewer
-          </button>
-
-          <button
-            onClick={() => setPersonality("friendly")}
-            className={`px-4 py-2 rounded-xl text-sm transition ${
-              personality === "friendly"
-                ? "bg-violet-500 text-white"
-                : "bg-white text-gray-700"
-            }`}
-          >
-            Friendly
-          </button>
-
+          {[
+            "jarvis",
+            "teacher",
+            "interviewer",
+            "friendly",
+          ].map((item) => (
+            <button
+              key={item}
+              onClick={() =>
+                setPersonality(item)
+              }
+              className={`px-4 py-2 rounded-xl text-sm whitespace-nowrap transition ${
+                personality === item
+                  ? "bg-gradient-to-r from-violet-500 to-blue-500 text-white shadow-md"
+                  : "bg-white text-gray-700 border border-gray-200"
+              }`}
+            >
+              {item}
+            </button>
+          ))}
         </div>
 
         {/* messages */}
-        <div className="flex-1 overflow-y-auto px-6 py-5 flex flex-col gap-4">
+        <div className="flex-1 overflow-y-auto px-3 md:px-6 py-5 flex flex-col gap-4">
 
           {messages.length === 0 && (
             <div className="flex flex-col items-center justify-center h-full text-center">
 
-              <div className="bg-gradient-to-r from-violet-500 to-blue-500 p-6 rounded-full mb-6 shadow-xl">
-                <Bot size={50} className="text-white" />
+              <div className="bg-gradient-to-r from-violet-500 to-blue-500 p-5 md:p-6 rounded-full mb-6 shadow-xl">
+                <Bot
+                  size={50}
+                  className="text-white"
+                />
               </div>
 
-              <h2 className="text-4xl font-bold text-gray-800 mb-3">
+              <h2 className="text-3xl md:text-5xl font-bold text-gray-800 mb-3">
                 Welcome 👋
               </h2>
 
-              <p className="text-gray-500 text-lg max-w-md">
+              <p className="text-gray-500 text-base md:text-lg max-w-md px-4">
                 Start chatting with your futuristic AI assistant
               </p>
             </div>
@@ -249,19 +241,25 @@ export default function Home() {
           {messages.map((msg, index) => (
             <div
               key={index}
-              className={`max-w-[80%] px-5 py-4 rounded-[28px] text-[15px] leading-relaxed shadow-md ${
+              className={`max-w-[92%] md:max-w-[80%] px-4 md:px-5 py-4 rounded-[24px] text-[14px] md:text-[15px] leading-relaxed shadow-md ${
                 msg.role === "user"
                   ? "bg-gradient-to-r from-violet-500 to-blue-500 text-white self-end rounded-br-md"
                   : "bg-white text-gray-800 self-start rounded-bl-md border border-gray-200"
               }`}
             >
-              {msg.content}
+              <div className="prose prose-sm max-w-none break-words">
+
+                <ReactMarkdown>
+                  {msg.content}
+                </ReactMarkdown>
+
+              </div>
             </div>
           ))}
 
           {/* loading */}
           {loading && (
-            <div className="bg-white border border-gray-200 text-gray-500 self-start px-5 py-4 rounded-[28px] rounded-bl-md text-sm animate-pulse shadow-md">
+            <div className="bg-white border border-gray-200 text-gray-500 self-start px-5 py-4 rounded-[24px] rounded-bl-md text-sm animate-pulse shadow-md">
               AI is typing...
             </div>
           )}
@@ -270,15 +268,17 @@ export default function Home() {
         </div>
 
         {/* input */}
-        <div className="p-5 border-t border-gray-200 bg-white/70 backdrop-blur-xl">
+        <div className="p-3 md:p-5 border-t border-gray-200 bg-white/70 backdrop-blur-xl">
 
-          <div className="flex items-center gap-3 bg-gray-100 rounded-[24px] p-3 shadow-inner">
+          <div className="flex items-center gap-2 md:gap-3 bg-gray-100 rounded-[24px] p-2 md:p-3 shadow-inner">
 
             <input
               type="text"
               placeholder="Ask anything..."
               value={message}
-              onChange={(e) => setMessage(e.target.value)}
+              onChange={(e) =>
+                setMessage(e.target.value)
+              }
 
               onKeyDown={(e) => {
                 if (e.key === "Enter") {
@@ -286,23 +286,29 @@ export default function Home() {
                 }
               }}
 
-              className="flex-1 bg-transparent px-3 py-3 outline-none text-gray-800 placeholder:text-gray-400 text-[15px]"
+              className="flex-1 bg-transparent px-2 md:px-3 py-3 outline-none text-gray-800 placeholder:text-gray-400 text-[14px] md:text-[15px]"
             />
 
             {/* mic */}
             <button
               onClick={startListening}
-              className="bg-pink-500 hover:bg-pink-600 transition p-4 rounded-2xl shadow-lg"
+              className="bg-pink-500 hover:bg-pink-600 transition p-3 md:p-4 rounded-2xl shadow-lg"
             >
-              <Mic size={20} className="text-white" />
+              <Mic
+                size={18}
+                className="text-white"
+              />
             </button>
 
             {/* send */}
             <button
               onClick={sendMessage}
-              className="bg-gradient-to-r from-violet-500 to-blue-500 hover:scale-105 transition p-4 rounded-2xl shadow-lg"
+              className="bg-gradient-to-r from-violet-500 to-blue-500 hover:scale-105 transition p-3 md:p-4 rounded-2xl shadow-lg"
             >
-              <Send size={20} className="text-white" />
+              <Send
+                size={18}
+                className="text-white"
+              />
             </button>
 
           </div>

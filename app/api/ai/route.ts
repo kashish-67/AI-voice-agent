@@ -1,4 +1,3 @@
-
 export async function POST(req: Request) {
   try {
     const body = await req.json();
@@ -17,7 +16,20 @@ export async function POST(req: Request) {
           messages: [
             {
               role: "system",
-              content: `You are a ${body.personality} AI assistant.`,
+              content: `
+You are a ${body.personality} AI assistant.
+
+Give responses like ChatGPT.
+
+Rules:
+- Use proper formatting
+- Use bullet points when needed
+- Use headings
+- Keep spacing clean
+- Make responses readable
+- Give professional answers
+- Keep responses concise but useful
+`,
             },
             {
               role: "user",
@@ -32,12 +44,15 @@ export async function POST(req: Request) {
 
     if (!data.choices) {
       return Response.json({
-        error: data.error?.message || "No response from Groq",
+        error:
+          data.error?.message ||
+          "No response from Groq",
       });
     }
 
     return Response.json({
-      reply: data.choices[0].message.content,
+      reply:
+        data.choices[0].message.content,
     });
 
   } catch (error: any) {
