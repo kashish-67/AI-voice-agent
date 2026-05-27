@@ -1,8 +1,13 @@
-
 "use client";
 
 import { useState, useRef, useEffect } from "react";
-import { Send, Mic, Bot, Trash2 } from "lucide-react";
+import {
+  Send,
+  Mic,
+  Bot,
+  Trash2,
+  Sparkles,
+} from "lucide-react";
 
 export default function Home() {
   const [message, setMessage] = useState("");
@@ -67,45 +72,40 @@ export default function Home() {
 
       const data = await response.json();
 
-      const aiMessage = {
-        role: "assistant",
-        content: data.reply || data.error,
-      };
-
       const fullText = data.reply || data.error;
 
-let currentText = "";
+      let currentText = "";
 
-const tempMessage = {
-  role: "assistant",
-  content: "",
-};
+      const tempMessage = {
+        role: "assistant",
+        content: "",
+      };
 
-setMessages((prev) => [...prev, tempMessage]);
+      setMessages((prev) => [...prev, tempMessage]);
 
-for (let i = 0; i < fullText.length; i++) {
+      for (let i = 0; i < fullText.length; i++) {
 
-  currentText += fullText[i];
+        currentText += fullText[i];
 
-  await new Promise((resolve) =>
-    setTimeout(resolve, 20)
-  );
+        await new Promise((resolve) =>
+          setTimeout(resolve, 15)
+        );
 
-  setMessages((prev: any) => {
-    const updated = [...prev];
+        setMessages((prev: any) => {
+          const updated = [...prev];
 
-    updated[updated.length - 1] = {
-      role: "assistant",
-      content: currentText,
-    };
+          updated[updated.length - 1] = {
+            role: "assistant",
+            content: currentText,
+          };
 
-    return updated;
-  });
-}
+          return updated;
+        });
+      }
 
       // voice reply
       const speech = new SpeechSynthesisUtterance(
-        data.reply || "Error"
+        fullText
       );
 
       speech.lang = "en-US";
@@ -122,51 +122,56 @@ for (let i = 0; i < fullText.length; i++) {
   };
 
   return (
-    <main className="min-h-screen bg-gradient-to-br from-black via-zinc-900 to-black text-white flex items-center justify-center p-4">
+    <main className="min-h-screen bg-gradient-to-br from-[#fdfbfb] to-[#ebedee] flex items-center justify-center p-4">
 
-      <div className="w-full max-w-2xl h-[90vh] bg-white/10 backdrop-blur-xl border border-white/10 rounded-3xl shadow-2xl flex flex-col overflow-hidden">
+      <div className="w-full max-w-3xl h-[92vh] bg-white/80 backdrop-blur-2xl border border-gray-200 rounded-[35px] shadow-[0_20px_80px_rgba(0,0,0,0.08)] flex flex-col overflow-hidden">
 
         {/* header */}
-        <div className="flex items-center justify-between p-5 border-b border-white/10 bg-white/5">
+        <div className="flex items-center justify-between p-6 border-b border-gray-200 bg-white/60 backdrop-blur-xl">
 
-          <div className="flex items-center gap-3">
-            <div className="bg-blue-500 p-3 rounded-2xl">
-              <Bot size={24} />
+          <div className="flex items-center gap-4">
+
+            <div className="bg-gradient-to-r from-violet-500 to-blue-500 p-4 rounded-3xl shadow-lg">
+              <Bot size={28} className="text-white" />
             </div>
 
             <div>
-              <h1 className="text-xl font-bold">
-                AI Voice Agent
+              <h1 className="text-2xl font-bold text-gray-800">
+                AI Voice Assistant
               </h1>
 
-              <p className="text-sm text-gray-400">
-                Smart Realtime Assistant
+              <p className="text-gray-500 text-sm flex items-center gap-1 mt-1">
+                <Sparkles size={14} />
+                Smart Premium AI Experience
               </p>
             </div>
           </div>
 
-          {/* clear chat */}
+          {/* clear */}
           <button
             onClick={clearChat}
-            className="bg-red-500 hover:bg-red-600 transition p-3 rounded-xl"
+            className="bg-red-100 hover:bg-red-200 transition p-3 rounded-2xl"
           >
-            <Trash2 size={20} />
+            <Trash2 size={20} className="text-red-500" />
           </button>
         </div>
 
         {/* messages */}
-        <div className="flex-1 overflow-y-auto p-5 flex flex-col gap-4">
+        <div className="flex-1 overflow-y-auto px-6 py-5 flex flex-col gap-4">
 
           {messages.length === 0 && (
-            <div className="flex flex-col items-center justify-center h-full text-center text-gray-400">
-              <Bot size={60} className="mb-4 opacity-60" />
+            <div className="flex flex-col items-center justify-center h-full text-center">
 
-              <h2 className="text-2xl font-bold mb-2">
+              <div className="bg-gradient-to-r from-violet-500 to-blue-500 p-6 rounded-full mb-6 shadow-xl">
+                <Bot size={50} className="text-white" />
+              </div>
+
+              <h2 className="text-4xl font-bold text-gray-800 mb-3">
                 Welcome 👋
               </h2>
 
-              <p>
-                Start chatting with your AI assistant
+              <p className="text-gray-500 text-lg max-w-md">
+                Start chatting with your futuristic AI assistant
               </p>
             </div>
           )}
@@ -174,10 +179,10 @@ for (let i = 0; i < fullText.length; i++) {
           {messages.map((msg, index) => (
             <div
               key={index}
-              className={`max-w-[80%] px-5 py-3 rounded-3xl text-sm leading-relaxed shadow-lg ${
+              className={`max-w-[80%] px-5 py-4 rounded-[28px] text-[15px] leading-relaxed shadow-md ${
                 msg.role === "user"
-                  ? "bg-blue-500 self-end rounded-br-md"
-                  : "bg-zinc-800 self-start rounded-bl-md"
+                  ? "bg-gradient-to-r from-violet-500 to-blue-500 text-white self-end rounded-br-md"
+                  : "bg-white text-gray-800 self-start rounded-bl-md border border-gray-200"
               }`}
             >
               {msg.content}
@@ -186,7 +191,7 @@ for (let i = 0; i < fullText.length; i++) {
 
           {/* loading */}
           {loading && (
-            <div className="bg-zinc-800 self-start px-5 py-3 rounded-3xl rounded-bl-md text-sm animate-pulse">
+            <div className="bg-white border border-gray-200 text-gray-500 self-start px-5 py-4 rounded-[28px] rounded-bl-md text-sm animate-pulse shadow-md">
               AI is typing...
             </div>
           )}
@@ -195,9 +200,9 @@ for (let i = 0; i < fullText.length; i++) {
         </div>
 
         {/* input */}
-        <div className="p-4 border-t border-white/10 bg-white/5">
+        <div className="p-5 border-t border-gray-200 bg-white/70 backdrop-blur-xl">
 
-          <div className="flex items-center gap-3 bg-zinc-900 rounded-2xl p-2">
+          <div className="flex items-center gap-3 bg-gray-100 rounded-[24px] p-3 shadow-inner">
 
             <input
               type="text"
@@ -205,30 +210,29 @@ for (let i = 0; i < fullText.length; i++) {
               value={message}
               onChange={(e) => setMessage(e.target.value)}
 
-              // enter press send
               onKeyDown={(e) => {
                 if (e.key === "Enter") {
                   sendMessage();
                 }
               }}
 
-              className="flex-1 bg-transparent px-3 py-3 outline-none text-white placeholder:text-gray-500"
+              className="flex-1 bg-transparent px-3 py-3 outline-none text-gray-800 placeholder:text-gray-400 text-[15px]"
             />
 
             {/* mic */}
             <button
               onClick={startListening}
-              className="bg-pink-500 hover:bg-pink-600 transition p-3 rounded-xl"
+              className="bg-pink-500 hover:bg-pink-600 transition p-4 rounded-2xl shadow-lg"
             >
-              <Mic size={20} />
+              <Mic size={20} className="text-white" />
             </button>
 
             {/* send */}
             <button
               onClick={sendMessage}
-              className="bg-blue-500 hover:bg-blue-600 transition p-3 rounded-xl"
+              className="bg-gradient-to-r from-violet-500 to-blue-500 hover:scale-105 transition p-4 rounded-2xl shadow-lg"
             >
-              <Send size={20} />
+              <Send size={20} className="text-white" />
             </button>
 
           </div>
