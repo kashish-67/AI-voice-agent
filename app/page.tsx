@@ -61,8 +61,7 @@ export default function Home() {
 
     //@ts-ignore
     const SpeechRecognition =
-      window.webkitSpeechRecognition;
-
+      (window as any).webkitSpeechRecognition;
     const recognition =
       new SpeechRecognition();
 
