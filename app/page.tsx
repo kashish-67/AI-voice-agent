@@ -18,7 +18,7 @@ export default function Home() {
 
   const [message, setMessage] = useState("");
 
-  const [messages, setMessages] = useState<any[]>(([]);
+  const [messages, setMessages] = useState<any[]>([]);
 
   const [loading, setLoading] = useState(false);
 
@@ -60,8 +60,11 @@ export default function Home() {
   const startListening = () => {
 
     //@ts-ignore
+    const SpeechRecognition =
+      window.webkitSpeechRecognition;
+
     const recognition =
-      new webkitSpeechRecognition();
+      new SpeechRecognition();
 
     recognition.lang = "en-US";
 
