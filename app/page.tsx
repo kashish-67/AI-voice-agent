@@ -22,6 +22,23 @@ export default function Home() {
       behavior: "smooth",
     });
   }, [messages, loading]);
+  
+  // load chats from localStorage
+useEffect(() => {
+  const savedMessages = localStorage.getItem("ai-chat");
+
+  if (savedMessages) {
+    setMessages(JSON.parse(savedMessages));
+  }
+}, []);
+
+// save chats to localStorage
+useEffect(() => {
+  localStorage.setItem(
+    "ai-chat",
+    JSON.stringify(messages)
+  );
+}, [messages]);
 
   // voice input
   const startListening = () => {
