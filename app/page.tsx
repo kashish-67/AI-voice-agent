@@ -226,11 +226,14 @@ export default function Home() {
 
             {/* voice toggle */}
             <button
-              onClick={() =>
-                setVoiceEnabled(
-                  !voiceEnabled
-                )
-              }
+              onClick={() => {
+
+  if (voiceEnabled) {
+    speechSynthesis.cancel();
+  }
+
+  setVoiceEnabled(!voiceEnabled);
+}}
               className={`transition p-2 md:p-3 rounded-2xl ${
                 voiceEnabled
                   ? "bg-green-100"
