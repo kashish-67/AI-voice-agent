@@ -1,25 +1,35 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
+
 import {
   Send,
   Mic,
   Bot,
   Trash2,
   Sparkles,
+  Volume2,
+  VolumeX,
 } from "lucide-react";
 
 import ReactMarkdown from "react-markdown";
 
 export default function Home() {
+
   const [message, setMessage] = useState("");
-  const [messages, setMessages] = useState<any[]>([]);
+
+  const [messages, setMessages] = useState<any[]>(([]);
+
   const [loading, setLoading] = useState(false);
+
+  const [voiceEnabled, setVoiceEnabled] =
+    useState(true);
 
   const [personality, setPersonality] =
     useState("friendly");
 
-  const messagesEndRef = useRef<HTMLDivElement | null>(null);
+  const messagesEndRef =
+    useRef<HTMLDivElement | null>(null);
 
   // auto scroll
   useEffect(() => {
@@ -30,7 +40,8 @@ export default function Home() {
 
   // load chats
   useEffect(() => {
-    const savedMessages = localStorage.getItem("ai-chat");
+    const savedMessages =
+      localStorage.getItem("ai-chat");
 
     if (savedMessages) {
       setMessages(JSON.parse(savedMessages));
@@ -47,14 +58,17 @@ export default function Home() {
 
   // voice input
   const startListening = () => {
+
     //@ts-ignore
-    const recognition = new webkitSpeechRecognition();
+    const recognition =
+      new webkitSpeechRecognition();
 
     recognition.lang = "en-US";
 
     recognition.start();
 
     recognition.onresult = (event: any) => {
+
       const transcript =
         event.results[0][0].transcript;
 
@@ -69,6 +83,7 @@ export default function Home() {
 
   // send message
   const sendMessage = async () => {
+
     if (!message.trim()) return;
 
     const userMessage = {
@@ -76,7 +91,10 @@ export default function Home() {
       content: message,
     };
 
-    setMessages((prev) => [...prev, userMessage]);
+    setMessages((prev) => [
+      ...prev,
+      userMessage,
+    ]);
 
     const currentMessage = message;
 
@@ -85,16 +103,21 @@ export default function Home() {
     setLoading(true);
 
     try {
-      const response = await fetch("/api/ai", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          message: currentMessage,
-          personality,
-        }),
-      });
+
+      const response = await fetch(
+        "/api/ai",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type":
+              "application/json",
+          },
+          body: JSON.stringify({
+            message: currentMessage,
+            personality,
+          }),
+        }
+      );
 
       const data = await response.json();
 
@@ -108,9 +131,16 @@ export default function Home() {
         content: "",
       };
 
-      setMessages((prev) => [...prev, tempMessage]);
+      setMessages((prev) => [
+        ...prev,
+        tempMessage,
+      ]);
 
-      for (let i = 0; i < fullText.length; i++) {
+      for (
+        let i = 0;
+        i < fullText.length;
+        i++
+      ) {
 
         currentText += fullText[i];
 
@@ -119,6 +149,7 @@ export default function Home() {
         );
 
         setMessages((prev: any) => {
+
           const updated = [...prev];
 
           updated[updated.length - 1] = {
@@ -131,18 +162,22 @@ export default function Home() {
       }
 
       // voice reply
-      const speech =
-        new SpeechSynthesisUtterance(
-          fullText
-        );
+      if (voiceEnabled) {
 
-      speech.lang = "en-US";
+        const speech =
+          new SpeechSynthesisUtterance(
+            fullText
+          );
 
-      speechSynthesis.speak(speech);
+        speech.lang = "en-US";
+
+        speechSynthesis.speak(speech);
+      }
 
       setLoading(false);
 
     } catch (error) {
+
       console.log(error);
 
       setLoading(false);
@@ -160,34 +195,79 @@ export default function Home() {
           <div className="flex items-center gap-3 md:gap-4">
 
             <div className="bg-gradient-to-r from-violet-500 to-blue-500 p-3 md:p-4 rounded-3xl shadow-lg">
+
               <Bot
                 size={24}
                 className="text-white"
               />
+
             </div>
 
             <div>
+
               <h1 className="text-xl md:text-3xl font-bold text-gray-800">
                 AI Voice Assistant
               </h1>
 
               <p className="text-gray-500 text-xs md:text-sm flex items-center gap-1 mt-1">
+
                 <Sparkles size={14} />
+
                 Premium AI Experience
+
               </p>
+
             </div>
           </div>
 
-          {/* clear */}
-          <button
-            onClick={clearChat}
-            className="bg-red-100 hover:bg-red-200 transition p-2 md:p-3 rounded-2xl"
-          >
-            <Trash2
-              size={18}
-              className="text-red-500"
-            />
-          </button>
+          <div className="flex items-center gap-2">
+
+            {/* voice toggle */}
+            <button
+              onClick={() =>
+                setVoiceEnabled(
+                  !voiceEnabled
+                )
+              }
+              className={`transition p-2 md:p-3 rounded-2xl ${
+                voiceEnabled
+                  ? "bg-green-100"
+                  : "bg-gray-200"
+              }`}
+            >
+
+              {voiceEnabled ? (
+
+                <Volume2
+                  size={18}
+                  className="text-green-600"
+                />
+
+              ) : (
+
+                <VolumeX
+                  size={18}
+                  className="text-gray-600"
+                />
+
+              )}
+
+            </button>
+
+            {/* clear */}
+            <button
+              onClick={clearChat}
+              className="bg-red-100 hover:bg-red-200 transition p-2 md:p-3 rounded-2xl"
+            >
+
+              <Trash2
+                size={18}
+                className="text-red-500"
+              />
+
+            </button>
+
+          </div>
         </div>
 
         {/* personalities */}
@@ -199,6 +279,7 @@ export default function Home() {
             "interviewer",
             "friendly",
           ].map((item) => (
+
             <button
               key={item}
               onClick={() =>
@@ -210,7 +291,9 @@ export default function Home() {
                   : "bg-white text-gray-700 border border-gray-200"
               }`}
             >
+
               {item}
+
             </button>
           ))}
         </div>
@@ -219,13 +302,16 @@ export default function Home() {
         <div className="flex-1 overflow-y-auto px-3 md:px-6 py-5 flex flex-col gap-4">
 
           {messages.length === 0 && (
+
             <div className="flex flex-col items-center justify-center h-full text-center">
 
               <div className="bg-gradient-to-r from-violet-500 to-blue-500 p-5 md:p-6 rounded-full mb-6 shadow-xl">
+
                 <Bot
                   size={50}
                   className="text-white"
                 />
+
               </div>
 
               <h2 className="text-3xl md:text-5xl font-bold text-gray-800 mb-3">
@@ -233,12 +319,16 @@ export default function Home() {
               </h2>
 
               <p className="text-gray-500 text-base md:text-lg max-w-md px-4">
+
                 Start chatting with your futuristic AI assistant
+
               </p>
+
             </div>
           )}
 
           {messages.map((msg, index) => (
+
             <div
               key={index}
               className={`max-w-[92%] md:max-w-[80%] px-4 md:px-5 py-4 rounded-[24px] text-[14px] md:text-[15px] leading-relaxed shadow-md ${
@@ -247,6 +337,7 @@ export default function Home() {
                   : "bg-white text-gray-800 self-start rounded-bl-md border border-gray-200"
               }`}
             >
+
               <div className="prose prose-sm max-w-none break-words">
 
                 <ReactMarkdown>
@@ -254,17 +345,22 @@ export default function Home() {
                 </ReactMarkdown>
 
               </div>
+
             </div>
           ))}
 
           {/* loading */}
           {loading && (
+
             <div className="bg-white border border-gray-200 text-gray-500 self-start px-5 py-4 rounded-[24px] rounded-bl-md text-sm animate-pulse shadow-md">
+
               AI is typing...
+
             </div>
           )}
 
           <div ref={messagesEndRef} />
+
         </div>
 
         {/* input */}
@@ -277,7 +373,9 @@ export default function Home() {
               placeholder="Ask anything..."
               value={message}
               onChange={(e) =>
-                setMessage(e.target.value)
+                setMessage(
+                  e.target.value
+                )
               }
 
               onKeyDown={(e) => {
@@ -294,10 +392,12 @@ export default function Home() {
               onClick={startListening}
               className="bg-pink-500 hover:bg-pink-600 transition p-3 md:p-4 rounded-2xl shadow-lg"
             >
+
               <Mic
                 size={18}
                 className="text-white"
               />
+
             </button>
 
             {/* send */}
@@ -305,10 +405,12 @@ export default function Home() {
               onClick={sendMessage}
               className="bg-gradient-to-r from-violet-500 to-blue-500 hover:scale-105 transition p-3 md:p-4 rounded-2xl shadow-lg"
             >
+
               <Send
                 size={18}
                 className="text-white"
               />
+
             </button>
 
           </div>
