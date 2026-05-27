@@ -1,146 +1,137 @@
-
 "use client";
 
 import { useState } from "react";
-import { Mic, Send } from "lucide-react";
-import { motion } from "framer-motion";
+import { Send, Mic } from "lucide-react";
 
 export default function Home() {
   const [message, setMessage] = useState("");
-  const [loading, setLoading] = useState(false);
+  const [messages, setMessages] = useState<any[]>([]);
 
-  const [chat, setChat] = useState<
-    { role: string; text: string }[]
-  >([]);
+  // voice input
+  const startListening = () => {
+    //@ts-ignore
+    const recognition = new webkitSpeechRecognition();
 
-  async function sendMessage(text?: string) {
-    const finalMessage = text || message;
+    recognition.lang = "en-US";
+    recognition.start();
 
-    if (!finalMessage) return;
+    recognition.onresult = (event: any) => {
+      const transcript = event.results[0][0].transcript;
+      setMessage(transcript);
+    };
+  };
 
-    setChat((prev) => [
-      ...prev,
-      { role: "user", text: finalMessage },
-    ]);
+  // send message
+  const sendMessage = async () => {
+    if (!message) return;
+
+    // user message add
+    const userMessage = {
+      role: "user",
+      content: message,
+    };
+
+    setMessages((prev) => [...prev, userMessage]);
+
+    const currentMessage = message;
 
     setMessage("");
 
-    setLoading(true);
+    try {
+      const response = await fetch("/api/ai", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          message: currentMessage,
+        }),
+      });
 
-    const res = await fetch("/api/ai", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        message: finalMessage,
-      }),
-    });
+      const data = await response.json();
 
-    const data = await res.json();
+      console.log(data);
 
-    setChat((prev) => [
-      ...prev,
-      {
+      // ai response add
+      const aiMessage = {
         role: "assistant",
-        text: data.reply,
-      },
-    ]);
+        content: data.reply || data.error,
+      };
 
-    const speech = new SpeechSynthesisUtterance(data.reply);
-    speechSynthesis.speak(speech);
+      setMessages((prev) => [...prev, aiMessage]);
 
-    setLoading(false);
-  }
+      // voice reply
+      const speech = new SpeechSynthesisUtterance(
+        data.reply || "Error"
+      );
 
-  function startListening() {
-    const SpeechRecognition =
-      (window as any).SpeechRecognition ||
-      (window as any).webkitSpeechRecognition;
+      speech.lang = "en-US";
 
-    const recognition = new SpeechRecognition();
+      speechSynthesis.speak(speech);
 
-    recognition.lang = "en-US";
-
-    recognition.onresult = async (event: any) => {
-      const text = event.results[0][0].transcript;
-
-      setMessage(text);
-
-      sendMessage(text);
-    };
-
-    recognition.start();
-  }
+    } catch (error) {
+      console.log(error);
+    }
+  };
 
   return (
     <main className="min-h-screen bg-black text-white flex items-center justify-center p-4">
-      <motion.div
-        initial={{ opacity: 0, y: 40 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="w-full max-w-3xl bg-white/10 backdrop-blur-lg border border-white/20 rounded-3xl p-6 shadow-2xl"
-      >
-        <h1 className="text-4xl font-bold text-center mb-2">
-          🤖 AI Voice Agent
-        </h1>
+      <div className="w-full max-w-md bg-zinc-900 rounded-3xl p-5 shadow-2xl">
 
-        <p className="text-center text-gray-300 mb-6">
-          Smart futuristic assistant
-        </p>
+        {/* heading */}
+        <div className="text-center mb-6">
+          <h1 className="text-3xl font-bold">
+            🤖 AI Voice Agent
+          </h1>
 
-        <div className="h-[400px] overflow-y-auto space-y-4 mb-6 pr-2">
-          {chat.map((msg, index) => (
-            <div
-              key={index}
-              className={`flex ${
-                msg.role === "user"
-                  ? "justify-end"
-                  : "justify-start"
-              }`}
-            >
-              <div
-                className={`max-w-[80%] p-4 rounded-2xl ${
-                  msg.role === "user"
-                    ? "bg-blue-500"
-                    : "bg-white/10 border border-white/20"
-                }`}
-              >
-                {msg.text}
-              </div>
-            </div>
-          ))}
-
-          {loading && (
-            <p className="text-gray-400 animate-pulse">
-              AI is thinking...
-            </p>
-          )}
+          <p className="text-gray-400 text-sm mt-2">
+            Smart futuristic assistant
+          </p>
         </div>
 
-        <div className="flex gap-3">
+        {/* messages */}
+        <div className="h-[400px] overflow-y-auto flex flex-col gap-3 mb-4">
+          {messages.map((msg, index) => (
+            <div
+              key={index}
+              className={`p-3 rounded-2xl max-w-[80%] ${
+                msg.role === "user"
+                  ? "bg-blue-500 self-end"
+                  : "bg-gray-700 self-start"
+              }`}
+            >
+              {msg.content}
+            </div>
+          ))}
+        </div>
+
+        {/* input */}
+        <div className="flex items-center gap-2">
           <input
             type="text"
             placeholder="Ask anything..."
             value={message}
             onChange={(e) => setMessage(e.target.value)}
-            className="flex-1 p-4 rounded-2xl bg-white/10 border border-white/20 outline-none"
+            className="flex-1 p-4 rounded-2xl bg-zinc-800 outline-none"
           />
 
+          {/* send button */}
           <button
-            onClick={() => sendMessage()}
-            className="bg-blue-500 hover:bg-blue-600 transition p-4 rounded-2xl"
+            onClick={sendMessage}
+            className="bg-blue-500 hover:bg-blue-600 p-4 rounded-2xl"
           >
             <Send size={22} />
           </button>
 
+          {/* mic button */}
           <button
             onClick={startListening}
-            className="bg-pink-500 hover:bg-pink-600 transition p-4 rounded-2xl"
+            className="bg-pink-500 hover:bg-pink-600 p-4 rounded-2xl"
           >
             <Mic size={22} />
           </button>
         </div>
-      </motion.div>
+      </div>
     </main>
   );
 }
