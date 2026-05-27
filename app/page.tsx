@@ -72,7 +72,36 @@ export default function Home() {
         content: data.reply || data.error,
       };
 
-      setMessages((prev) => [...prev, aiMessage]);
+      const fullText = data.reply || data.error;
+
+let currentText = "";
+
+const tempMessage = {
+  role: "assistant",
+  content: "",
+};
+
+setMessages((prev) => [...prev, tempMessage]);
+
+for (let i = 0; i < fullText.length; i++) {
+
+  currentText += fullText[i];
+
+  await new Promise((resolve) =>
+    setTimeout(resolve, 20)
+  );
+
+  setMessages((prev: any) => {
+    const updated = [...prev];
+
+    updated[updated.length - 1] = {
+      role: "assistant",
+      content: currentText,
+    };
+
+    return updated;
+  });
+}
 
       // voice reply
       const speech = new SpeechSynthesisUtterance(
