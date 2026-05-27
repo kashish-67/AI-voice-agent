@@ -2,11 +2,13 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
-import { Send, Mic, Bot } from "lucide-react";
+import { Send, Mic, Bot, Trash2 } from "lucide-react";
 
 export default function Home() {
   const [message, setMessage] = useState("");
   const [messages, setMessages] = useState<any[]>([]);
+  const [loading, setLoading] = useState(false);
+
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
 
   // auto scroll
@@ -14,7 +16,7 @@ export default function Home() {
     messagesEndRef.current?.scrollIntoView({
       behavior: "smooth",
     });
-  }, [messages]);
+  }, [messages, loading]);
 
   // voice input
   const startListening = () => {
@@ -28,6 +30,11 @@ export default function Home() {
       const transcript = event.results[0][0].transcript;
       setMessage(transcript);
     };
+  };
+
+  // clear chat
+  const clearChat = () => {
+    setMessages([]);
   };
 
   // send message
@@ -44,6 +51,8 @@ export default function Home() {
     const currentMessage = message;
 
     setMessage("");
+
+    setLoading(true);
 
     try {
       const response = await fetch("/api/ai", {
@@ -74,8 +83,12 @@ export default function Home() {
 
       speechSynthesis.speak(speech);
 
+      setLoading(false);
+
     } catch (error) {
       console.log(error);
+
+      setLoading(false);
     }
   };
 
@@ -85,20 +98,31 @@ export default function Home() {
       <div className="w-full max-w-2xl h-[90vh] bg-white/10 backdrop-blur-xl border border-white/10 rounded-3xl shadow-2xl flex flex-col overflow-hidden">
 
         {/* header */}
-        <div className="flex items-center gap-3 p-5 border-b border-white/10 bg-white/5">
-          <div className="bg-blue-500 p-3 rounded-2xl">
-            <Bot size={24} />
+        <div className="flex items-center justify-between p-5 border-b border-white/10 bg-white/5">
+
+          <div className="flex items-center gap-3">
+            <div className="bg-blue-500 p-3 rounded-2xl">
+              <Bot size={24} />
+            </div>
+
+            <div>
+              <h1 className="text-xl font-bold">
+                AI Voice Agent
+              </h1>
+
+              <p className="text-sm text-gray-400">
+                Smart Realtime Assistant
+              </p>
+            </div>
           </div>
 
-          <div>
-            <h1 className="text-xl font-bold">
-              AI Voice Agent
-            </h1>
-
-            <p className="text-sm text-gray-400">
-              Smart Realtime Assistant
-            </p>
-          </div>
+          {/* clear chat */}
+          <button
+            onClick={clearChat}
+            className="bg-red-500 hover:bg-red-600 transition p-3 rounded-xl"
+          >
+            <Trash2 size={20} />
+          </button>
         </div>
 
         {/* messages */}
@@ -130,6 +154,13 @@ export default function Home() {
               {msg.content}
             </div>
           ))}
+
+          {/* loading */}
+          {loading && (
+            <div className="bg-zinc-800 self-start px-5 py-3 rounded-3xl rounded-bl-md text-sm animate-pulse">
+              AI is typing...
+            </div>
+          )}
 
           <div ref={messagesEndRef} />
         </div>
