@@ -163,19 +163,6 @@ export default function Home() {
         });
       }
 
-      // voice reply
-      if (voiceEnabled) {
-
-        const speech =
-          new SpeechSynthesisUtterance(
-            fullText
-          );
-
-        speech.lang = "en-US";
-
-        speechSynthesis.speak(speech);
-      }
-
       setLoading(false);
 
     } catch (error) {
