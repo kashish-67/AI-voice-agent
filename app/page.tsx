@@ -8,8 +8,6 @@ import {
   Bot,
   Trash2,
   Sparkles,
-  Volume2,
-  VolumeX,
 } from "lucide-react";
 
 import ReactMarkdown from "react-markdown";
@@ -22,9 +20,7 @@ export default function Home() {
 
   const [loading, setLoading] = useState(false);
 
-  const [voiceEnabled, setVoiceEnabled] =
-    useState(true);
-
+  
   const [personality, setPersonality] =
     useState("friendly");
 
@@ -210,41 +206,6 @@ export default function Home() {
           </div>
 
           <div className="flex items-center gap-2">
-
-            {/* voice toggle */}
-            <button
-              onClick={() => {
-
-  if (voiceEnabled) {
-    speechSynthesis.cancel();
-  }
-
-  setVoiceEnabled(!voiceEnabled);
-}}
-              className={`transition p-2 md:p-3 rounded-2xl ${
-                voiceEnabled
-                  ? "bg-green-100"
-                  : "bg-gray-200"
-              }`}
-            >
-
-              {voiceEnabled ? (
-
-                <Volume2
-                  size={18}
-                  className="text-green-600"
-                />
-
-              ) : (
-
-                <VolumeX
-                  size={18}
-                  className="text-gray-600"
-                />
-
-              )}
-
-            </button>
 
             {/* clear */}
             <button
