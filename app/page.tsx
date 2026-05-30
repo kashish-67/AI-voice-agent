@@ -41,7 +41,7 @@ export default function Home() {
   // load chats
   useEffect(() => {
     const savedMessages =
-      localStorage.getItem("ai-chat");
+      sessionStorage.getItem("ai-chat");
 
     if (savedMessages) {
       setMessages(JSON.parse(savedMessages));
@@ -50,7 +50,7 @@ export default function Home() {
 
   // save chats
   useEffect(() => {
-    localStorage.setItem(
+    sessionStorage.setItem(
       "ai-chat",
       JSON.stringify(messages)
     );
