@@ -57,26 +57,109 @@ export default function Home() {
   }, [messages]);
 
   // voice input
-  const startListening = () => {
+  const startListening = async () => {
 
-    //@ts-ignore
-    const SpeechRecognition =
-      (window as any).webkitSpeechRecognition;
-    const recognition =
-      new SpeechRecognition();
+  //@ts-ignore
+  const SpeechRecognition =
+    (window as any).webkitSpeechRecognition;
 
-    recognition.lang = "en-US";
+  const recognition =
+    new SpeechRecognition();
 
-    recognition.start();
+  recognition.lang = "en-US";
+  recognition.continuous = false;
+  recognition.interimResults = false;
 
-    recognition.onresult = (event: any) => {
+  recognition.start();
 
-      const transcript =
-        event.results[0][0].transcript;
+  recognition.onresult = async (event: any) => {
 
-      setMessage(transcript);
-    };
+    const transcript =
+      event.results[0][0].transcript;
+
+    setLoading(true);
+
+    try {
+
+      const response = await fetch(
+        "/api/ai",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type":
+              "application/json",
+          },
+          body: JSON.stringify({
+            message: transcript,
+            personality,
+          }),
+        }
+      );
+
+      const data = await response.json();
+
+      const fullText =
+        data.reply || data.error;
+
+      let currentText = "";
+
+      setMessages((prev) => [
+        ...prev,
+        {
+          role: "assistant",
+          content: "",
+        },
+      ]);
+
+      for (
+        let i = 0;
+        i < fullText.length;
+        i++
+      ) {
+
+        currentText += fullText[i];
+
+        await new Promise((resolve) =>
+          setTimeout(resolve, 10)
+        );
+
+        setMessages((prev: any) => {
+
+          const updated = [...prev];
+
+          updated[
+            updated.length - 1
+          ] = {
+            role: "assistant",
+            content: currentText,
+          };
+
+          return updated;
+        });
+      }
+
+      if (voiceEnabled) {
+
+        const speech =
+          new SpeechSynthesisUtterance(
+            fullText
+          );
+
+        speech.lang = "en-US";
+
+        speechSynthesis.speak(speech);
+      }
+
+    } catch (error) {
+
+      console.log(error);
+
+    } finally {
+
+      setLoading(false);
+    }
   };
+};
 
   // clear chat
   const clearChat = () => {
