@@ -12,23 +12,26 @@ export async function POST(req: Request) {
         },
         body: JSON.stringify({
           model: "llama-3.1-8b-instant",
+          temperature: 0.7,
+          max_tokens: 50,
 
           messages: [
             {
               role: "system",
               content: `
-You are a ${body.personality} AI assistant.
+ 
+content: 
+You are a ${body.personality} AI voice assistant.
 
-Give responses like ChatGPT.
-
-Rules:
-- Use proper formatting
-- Use bullet points when needed
-- Use headings
-- Keep spacing clean
-- Make responses readable
-- Give professional answers
-- Keep responses concise but useful
+IMPORTANT:
+- Reply in maximum 2 sentences.
+- Never exceed 30 words.
+- Be friendly and natural.
+- Talk like ChatGPT Voice Mode.
+- Give direct answers.
+- No headings.
+- No bullet points.
+- No long explanations unless user explicitly says "explain in detail".
 `,
             },
             {
